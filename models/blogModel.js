@@ -18,21 +18,21 @@ const blogSchema = new mongoose.Schema(
       required: "AuthorId is Required",
       ref: "Author",
     },
-    tags: {
-      type: [String],
+    tags: [{
+      type: String,
       trim: true,
-    },
+    }],
 
     category: {
-      type: [String],
+      type: String,
       required: "Blog category is Required",
       trim: true,
     },
 
-    subcategory: {
-      type: [String],
+    subcategory: [{
+      type: String,
       trim: true,
-    },
+    }],
     isDeleted: {
       type: Boolean,
       default: false,

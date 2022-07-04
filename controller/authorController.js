@@ -78,6 +78,8 @@ const createAuthor = async function (req, res) {
       res.status(500).send({ error: err.message });
     }
   };
+
+
   const login = async function (req, res) {
     try {
       let data = req.body;
@@ -122,11 +124,12 @@ const createAuthor = async function (req, res) {
         "IUBGIU22NKJWWEW89NO2ODWOIDH2"
       );
   
-      res.setHeader("x-api-key", token);
+      res.header("x-api-key", token)
+      res.status(200).send({status: true, msg:`Author login succesfully`, data: {token}});
   
       res
-        .status(201)
-        .send({ status: true, msg: "Author login successful!!", token });
+        .status(200)
+        .send({ status: true, data:token });
     } catch (err) {
       res.status(500).send({ status: false, msg: err.message });
     }
