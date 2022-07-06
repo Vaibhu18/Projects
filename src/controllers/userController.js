@@ -76,7 +76,7 @@ const createUser = async function(req,res) {
             return res.status(400).send({status: false, message: "Invaild E-mail Format." })
         }
         const email = await userModel.findOne({ email: data.email }) 
-        if(email) return res.status(404).send({ status:false,message: "Email already exists, please enter anothor Email" })
+        if(email) return res.status(400).send({ status:false, message: "Email already exists, please enter anothor Email" })
     
 
         // Password Validation
@@ -128,7 +128,6 @@ const userLogIn = async function(req, res){
         if(!validateEmail(data.email)) {
             return res.status(400).send({status: false, message: "Invaild E-mail Format." })
         }
-    
         
         // Password Validation
         if(!data.password) return res.status(400).send({ status: false, message: "Password is missing" });

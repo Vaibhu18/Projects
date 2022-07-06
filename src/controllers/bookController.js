@@ -8,7 +8,7 @@ const isValid = function (value) {
     return true
 }
 
-const isValidDate = (d) => moment(d, 'DD-MMM-YYYY', true).isValid()
+const isValidDate = (d) => moment(d, 'YYYY-MM-DD', true).isValid()
 
 const createBook = async function(req, res){
     try{
@@ -33,7 +33,7 @@ const createBook = async function(req, res){
         if(!isValid(data.ISBN)) return res.status(400).send({status: false, message: "ISBN is Required.." })
         
         let checkISBN = await bookModel.findOne({ISBN: data.ISBN})
-        if(checkISBN) return res.status(404).send({status: false, message: "ISBN already exists, please enter anothor ISBN" })
+        if(checkISBN) return res.status(400).send({status: false, message: "ISBN already exists, please enter anothor ISBN" })
 
         if(!isValid(data.category)) return res.status(400).send({status: false, message: "Category is Required.." })
 
