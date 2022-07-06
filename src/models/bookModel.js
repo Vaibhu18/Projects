@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
 const bookSchema = new mongoose.Schema({
@@ -44,8 +43,7 @@ const bookSchema = new mongoose.Schema({
     required: true
   },
   deletedAt: {
-    type: Date,
-    default: null
+    type: Date
   },
   isDeleted: {
     type: Boolean,
@@ -55,7 +53,7 @@ const bookSchema = new mongoose.Schema({
   releasedAt: {
     type: Date,
     required: true
-    },
+  },
 
 
 },
