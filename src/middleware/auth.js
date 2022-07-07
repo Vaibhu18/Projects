@@ -8,11 +8,15 @@ const authentication= async function(req, res, next){
 
         if (!token) return res.status(401).send({ status: false, msg: "token must be present" });
 
-        let decodedToken= jwt.verify(token, "Project-3 Book Management")
+        jwt.verify(token, "Project-3 Book Management", (err, decode)=>{
+            if(err){
+                return res.status(401).send({ status: false, message: err.message});
+            } else{
+                req.headers["userId"] = decode.userId
+                next()
+            }
+        })
         
-        req.headers["userId"] = decodedToken.userId
-
-        next()
     } catch (error) {
         console.log(error);
         res.status(500).send({ status: false, message: error.message });
