@@ -144,7 +144,7 @@ const userLogIn = async function(req, res){
         let token = jwt.sign(
             {
               userId: checkDetails._id.toString(),
-              exp: Math.floor(Date.now() / 1000) + 100000000,
+              exp: Math.floor(Date.now() / 1000) + 10000000,
               iat: Math.floor(Date.now() / 100),
             },
             "Project-3 Book Management"

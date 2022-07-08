@@ -60,22 +60,29 @@ const getBooksByFilter = async function(req, res){
     try{
         let data = req.query
         if (Object.keys(data).length == 0) return res.status(400).send({ status: false, message: "No Filter Found" })
-        
-        let filter ={
-            isDeleted: false
-        }
 
-        if (data.subcategory) {
-            data.subcategory = { $in: data.subcategory.split(',') }
-        }
-
-        filter['$or'] = [
-            { userId: data.userId},
-            { category: data.category },
-            { subcategory: data.subcategory }
+        let filter = [
+            {userId: data.userId},
+            {category: data.category} ,
+            {subcategory: data.subcategory} 
         ]
+        
+        for (let i = 0; i < filter.length; i++) {
+            // "x" is an element(OBJECT type) inside filter (index according to iteration)
+            let x = filter[i];
+        
+            // Object.values() is used to access the value of "x" OBJECT; since we don't know the key(changes according to iteration)
+            
+            // valueArr is an ARRAY containing a single element(value of "x" OBJECT)
+            valueArr = Object.values(x);
+            // Hence, we will use valueArr[0] to access it
+            if (!valueArr[0]) {
+                filter.splice(i, 1);
+              i--;
+            }
+        }
 
-        let bookData = await bookModel.find(filter).select({_id: 1, title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1}).sort({"title": 1})
+        let bookData = await bookModel.find({ $and: [{isDeleted: false}, {$and: filter}] }).select({_id: 1, title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1}).sort({"title": 1})
 
         if(bookData.length == 0) return res.status(404).send({status: false, message: "No Such Book Exists.."})
 
