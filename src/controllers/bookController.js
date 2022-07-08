@@ -1,6 +1,5 @@
 const bookModel = require("../models/bookModel")
 const userModel = require("../models/userModel")
-// const moment = require('moment')
 const reviewModel = require("../models/reviewModel")
 
 const isValid = function (value) {
@@ -8,8 +7,6 @@ const isValid = function (value) {
     if (typeof value !== "string" || value.trim().length === 0) return false
     return true
 }
-
-// const isValidDate = (d) => moment(d, 'YYYY-MM-DD', true).isValid()
 
 const createBook = async function(req, res){
     try{
@@ -36,7 +33,8 @@ const createBook = async function(req, res){
 
         if(!isValid(data.ISBN)) return res.status(400).send({status: false, message: "ISBN is Required.." })
 
-        if(!(/^(\d{13}|\d{17})?$/).test(data.ISBN)) return res.status(400).send({status: false, message: "ISBN is not Valid" })
+        // Validation for ISBN 10 or 13
+        if(!(/^(?:ISBN(?:-1[03])?:? )?(?=[0-9X]{10}$|(?=(?:[0-9]+[- ]){3})[- 0-9X]{13}$|97[89][0-9]{10}$|(?=(?:[0-9]+[- ]){4})[- 0-9]{17}$)(?:97[89][- ]?)?[0-9]{1,5}[- ]?[0-9]+[- ]?[0-9]+[- ]?[0-9X]$/i).test(data.ISBN)) return res.status(400).send({status: false, message: "ISBN is not Valid" })
         
         let checkISBN = await bookModel.findOne({ISBN: data.ISBN})
         if(checkISBN) return res.status(400).send({status: false, message: "ISBN already exists, please enter anothor ISBN" })
