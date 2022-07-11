@@ -2,9 +2,6 @@ const reviewModel = require("../models/reviewModel")
 const bookModel = require("../models/bookModel")
 const moment = require('moment')
 
-const isValidName = (name) => { 
-    return String(name).match(/^[a-zA-Z ]/)
-}
 
 const createReview = async function (req, res) {
     try {
@@ -12,12 +9,14 @@ const createReview = async function (req, res) {
         if(Object.keys(data).length == 0) return res.status(400).send({status: false, message: "Field Can't Empty.Please Enter Some Review Details" })
 
         let id = req.params.bookId
+        if (validation.isValidObjectId(id)) return res.status(400).send({ status: false, message: "Please enter valid BookId" })
+        
         let checkbookId = await bookModel.findOne({_id: id, isDeleted: false})
         if (!checkbookId) return res.status(404).send({ status: false, message: "No Book Exists With This ID.." })
 
         if (!data.reviewedBy) return res.status(400).send({ status: false, message: "reviewer name must be required" });
 
-        if (!isValidName(data.reviewedBy)) return res.status(400).send({ status: false, message: "Pls Enter Valid reviewer Name only in Alphabet format" })
+        if (validation.isValidName(data.reviewedBy)) return res.status(400).send({ status: false, message: "Pls Enter Valid reviewer Name only in Alphabet format" })
 
         if (!data.rating) return res.status(400).send({ status: false, message: "rating must be required" }); 
 
@@ -40,12 +39,12 @@ const createReview = async function (req, res) {
 const updateReviews = async function(req,res){
     try {
         let bookId = req.params.bookId
+        if (validation.isValidObjectId(bookId)) return res.status(400).send({ status: false, message: "Please enter valid BookId" })
+
         let reviewId = req.params.reviewId
+        if (validation.isValidObjectId(reviewId)) return res.status(400).send({ status: false, message: "Please enter valid ReviewId" })
+
         let data = req.body
-
-        if(bookId.length != 24)return res.status(400).send({ status: false, message: "Invalid BookId"})
-
-        if(reviewId.length != 24)return res.status(400).send({ status: false, message: "Invalid reviewId"})
 
         if (Object.keys(data).length == 0) return res.status(400).send({ status: false, message: "Field Can't Empty.Please Enter Some Review Details" })
 
@@ -91,11 +90,10 @@ const updateReviews = async function(req,res){
 const deleteReview =  async function(req,res){ 
     try {
         let bookId = req.params.bookId
+        if (validation.isValidObjectId(bookId)) return res.status(400).send({ status: false, message: "Please enter valid BookId" })
+
         let reviewId = req.params.reviewId
-
-        if(bookId.length != 24)return res.status(400).send({ status: false, message: "Invalid BookId"})
-
-        if(reviewId.length != 24)return res.status(400).send({ status: false, message: "Invalid reviewId"})
+        if (validation.isValidObjectId(reviewId)) return res.status(400).send({ status: false, message: "Please enter valid ReviewId" })
 
         let checkreviewId = await reviewModel.findOne({ _id: reviewId, isDeleted: false })
         if (!checkreviewId) return res.status(404).send({ status: false, message: "Review Not found. Please Provide Valid Review ID" })

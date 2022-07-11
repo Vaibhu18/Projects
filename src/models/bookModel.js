@@ -37,7 +37,7 @@ const bookSchema = new mongoose.Schema(
       type: [String],
       required: true,
       trim: true,
-      lowercase: true,
+      lowercase: false,
     },
     reviews: {
       type: Number,
@@ -51,11 +51,9 @@ const bookSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-
     releasedAt: {
       type: Date,
       required: true,
-      default: Date.now(),
     },
   },
   { timestamps: true }
