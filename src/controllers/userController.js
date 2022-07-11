@@ -1,4 +1,5 @@
 const userModel = require("../models/userModel")
+const validation = require("../validation/validate")
 const jwt = require('jsonwebtoken')
 
 
@@ -14,21 +15,20 @@ const createUser = async function(req,res) {
             return res.status(400).send({status:false ,message:"Title is missing"});
         }
 
-        
-        if(validation.isValidTitle(data.title)) return res.status(400).send({ status: false, message: 'Enter valid title' });
+        if(!validation.isValidTitle(data.title)) return res.status(400).send({ status: false, message: 'Enter valid title' });
 
 
         // Name Validation
-        if(validation.isValid(data.name)) return res.status(400).send({status: false, message: "Please Enter Name/ Name is Missing",});
+        if(!validation.isValid(data.name)) return res.status(400).send({status: false, message: "Please Enter Name/ Name is Missing",});
 
-        if(validation.isValidName(data.name)) {
+        if(!validation.isValidName(data.name)) {
             return res.status(400).send({status: false, message: "Name must contain Alphabet",});
         }
         
         
         // Phone Validation
         if(!data.phone) return res.status(400).send({status: false, message: "Phone Number is missing"})
-        if(validation.isValidPhoneNumber(data.phone)) {
+        if(!validation.isValidPhoneNumber(data.phone)) {
             return res.status(400).send({ status: false, message: "Mobile number should be of 10 Digits" })
         }
 
@@ -40,7 +40,7 @@ const createUser = async function(req,res) {
         if(!data.email){
             return res.status(400).send({status: false, message: "Email is missing"})
         }
-        if(validation.isValidateEmail(data.email)) {
+        if(!validation.isValidateEmail(data.email)) {
             return res.status(400).send({status: false, message: "Invaild E-mail Format." })
         }
         const email = await userModel.findOne({ email: data.email }) 
@@ -50,7 +50,7 @@ const createUser = async function(req,res) {
         // Password Validation
         if(!data.password) return res.status(400).send({ status: false, message: "Password is missing" });
 
-        if(validation.isValidPassword(data.password)) return res.status(400).send({ status: false, message: "Password should be within 8-15 Characters and must contain special, number, upper and lower character" }) //password validation
+        if(!validation.isValidPassword(data.password)) return res.status(400).send({ status: false, message: "Password should be within 8-15 Characters and must contain special, number, upper and lower character" }) //password validation
         
         
         // Address Validation
@@ -64,13 +64,13 @@ const createUser = async function(req,res) {
             return res.status(400).send({ status: false, message: "street, city, pincode all three are required" })
 
         // Valid Pincode format
-        if (validation.isValidPinCode(data.address.pincode))
+        if (!validation.isValidPinCode(data.address.pincode))
             return res.status(400).send({ status: false.valueOf, message: "pincode format not correct" })
 
         if (!data.address.street)
             return res.status(400).send({ status: false, message: "Pls Enter Valid street" })
 
-        if (validation.validateName(data.address.city))
+        if (!validation.isValidName(data.address.city))
             return res.status(400).send({ status: false, message: "Pls Enter Valid city" })
 
         const user = await userModel.create(data);
@@ -93,14 +93,14 @@ const userLogIn = async function(req, res){
         if(!data.email){
             return res.status(400).send({status: false, message: "Email is missing"})
         }
-        if(validation.isValidateEmail(data.email)) {
+        if(!validation.isValidateEmail(data.email)) {
             return res.status(400).send({status: false, message: "Invaild E-mail Format." })
         }
         
         // Password Validation
         if(!data.password) return res.status(400).send({ status: false, message: "Password is missing" });
         
-        if(validation.isValidPassword(data.password)) return res.status(400).send({ status: false, message: "Password should be within 8-15 Characters and must contain special, number, upper and lower character" }) //password validation
+        if(!validation.isValidPassword(data.password)) return res.status(400).send({ status: false, message: "Password should be within 8-15 Characters and must contain special, number, upper and lower character" }) //password validation
         
         
         // Verifying Login

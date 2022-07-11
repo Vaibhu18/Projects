@@ -115,7 +115,7 @@ const getBookByParams = async function(req, res){
     try{
         let id = req.params.bookId 
 
-        if (validation.isValidObjectId(id)) return res.status(400).send({ status: false, message: "Please enter valid BookId" })
+        if (!validation.isValidObjectId(id)) return res.status(400).send({ status: false, message: "Please enter valid BookId" })
 
         let checkBookIsPresent = await bookModel.findOne({_id: id, isDeleted:false})
         if(!checkBookIsPresent) return res.status(404).send({ status: false , message: "No Such Book Found" })
