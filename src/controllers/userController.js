@@ -26,7 +26,7 @@ const validateName = (name) => {
 }
 
 const isValidTitle = function(title){
-    return ["Mr", "Ms", "Miss"].indexOf(title) !== -1
+    return ["Mr", "Mrs", "Miss"].indexOf(title) !== -1
 }
 
 const isValidPinCode = (pincode) => {

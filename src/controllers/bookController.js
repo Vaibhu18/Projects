@@ -1,6 +1,7 @@
 const bookModel = require("../models/bookModel")
 const userModel = require("../models/userModel")
 const reviewModel = require("../models/reviewModel")
+const moment = require('moment')
 
 const isValid = function (value) {
     if ( value === "undefined" || value === null) return false
@@ -45,6 +46,8 @@ const createBook = async function(req, res){
 
         if(!data.releasedAt) return res.status(400).send({status: false, message: "Released Date is Required.." })
 
+        if (!moment(data.releasedAt, "YYYY-MM-DD", true).isValid()) return res.status(400).send({ status: false, message: "Please enter Date In YYYY-MM-DD Format" })
+
         if(data.isDeleted) data.deletedAt = new Date().toISOString();
         
         let bookData = await bookModel.create(data)
@@ -61,32 +64,45 @@ const getBooksByFilter = async function(req, res){
         let data = req.query
         if (Object.keys(data).length == 0) return res.status(400).send({ status: false, message: "No Filter Found" })
 
-        let filter = [
-            {userId: data.userId},
-            {category: data.category} ,
-            {subcategory: data.subcategory} 
-        ]
-        
-        for (let i = 0; i < filter.length; i++) {
-            // "x" is an element(OBJECT type) inside filter (index according to iteration)
-            let x = filter[i];
-        
-            // Object.values() is used to access the value of "x" OBJECT; since we don't know the key(changes according to iteration)
-            
-            // valueArr is an ARRAY containing a single element(value of "x" OBJECT)
-            valueArr = Object.values(x);
-            // Hence, we will use valueArr[0] to access it
-            if (!valueArr[0]) {
-                filter.splice(i, 1);
-              i--;
-            }
+        let { userId, category, subcategory } = req.query    
+
+        if(!data["subcategory"] && !data["category"] && !data["userId"]){
+            return res.status(400).send({ status: false, message: "Don't left blank query" })
         }
 
-        let bookData = await bookModel.find({ $and: [{isDeleted: false}, {$and: filter}] }).select({_id: 1, title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1}).sort({"title": 1})
+        let query = { 
+            isDeleted: false 
+        }
+        
+        if (userId) {
+            if (userId.trim().length == 0) return res.status(400).send({ status: false, message: "Dont Left userId Query Empty" })
+            
+            if(userId.length !==24) return res.status(400).send({status : false, message : "invalid userId format"})
+            
+            let data = await userModel.findById({ _id: userId })
+            
+            if (!data) return res.status(400).send({ status: false, message: "The userId is invalid" })
+            query.userId = userId
+        }
 
-        if(bookData.length == 0) return res.status(404).send({status: false, message: "No Such Book Exists.."})
+        if (category) {
+            if (category.trim().length == 0) return res.status(400).send({ status: false, message: "Dont Left Category Query Empty" })
+            query.category = category
+        }
 
-        return res.status(200).send({status: true, message: "Book List", data: bookData})
+        if (subcategory) {
+            if (subcategory.trim().length == 0) return res.status(400).send({ status: false, message: "Dont Left subcategory Query Empty" })
+            query.subcategory = subcategory.trim()
+        }
+
+        let bookData = await bookModel.find(query).select({_id: 1, title: 1, excerpt: 1, userId: 1, category: 1, subcategory: 1, reviews: 1, releasedAt: 1}).sort({"title": 1})
+
+        if (bookData.length == 0) {
+            return res.status(404).send({ status: false, message: "No book Found with provided information...Please Check Book Details or The Upper And Lower Cases Of letter" })
+        }
+        else {
+            return res.status(200).send({ status: true, message: "Books list", data: bookData })
+        }
     }
     catch(err) {
         console.log(err)
@@ -115,7 +131,7 @@ const getBookByParams = async function(req, res){
             updatedAt: checkBookIsPresent.updatedAt 
         }
         
-        let review = await reviewModel.find({bookId: id, isDeleted:false})
+        let review = await reviewModel.find({bookId: id, isDeleted:false}).select({_id: 1, bookId: 1, reviewedBy: 1, reviewedAt: 1, rating: 1, review: 1})
         resultObject["reviewsData"] = review
 
         return res.status(200).send({status: true, message: "Book List", data: resultObject})
