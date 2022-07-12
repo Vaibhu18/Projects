@@ -63,46 +63,56 @@ const createBook = async function(req, res){
 const getBooksByFilter = async function(req, res){
     try{
         let data = req.query
-        if (Object.keys(data).length == 0) return res.status(400).send({ status: false, message: "No Filter Found" })
+        if (Object.keys(data).length != 0) {
 
-        let { userId, category, subcategory } = req.query    
+            let { userId, category, subcategory } = req.query    
 
-        if(!data["subcategory"] && !data["category"] && !data["userId"]){
-            return res.status(400).send({ status: false, message: "Don't left blank query" })
-        }
+            if(!data["subcategory"] && !data["category"] && !data["userId"]){
+                return res.status(400).send({ status: false, message: "Don't leave blank value in query" })
+            }
 
-        let query = { 
-            isDeleted: false 
-        }
-        
-        if (userId) {
-            if (userId.trim().length == 0) return res.status(400).send({ status: false, message: "Dont Left userId Query Empty" })
-
-            if (validation.isValidObjectId(userId)) return res.status(400).send({ status: false, message: "Please enter valid userId" })
+            let query = { 
+                isDeleted: false 
+            }
             
-            let data = await userModel.findById({ _id: userId })
-            
-            if (!data) return res.status(400).send({ status: false, message: "The userId is invalid" })
-            query.userId = userId
-        }
+            if (userId) {
+                if (userId.trim().length == 0) return res.status(400).send({ status: false, message: "Dont Left userId Query Empty" })
 
-        if (category) {
-            if (category.trim().length == 0) return res.status(400).send({ status: false, message: "Dont Left Category Query Empty" })
-            query.category = category
-        }
+                if (validation.isValidObjectId(userId)) return res.status(400).send({ status: false, message: "Please enter valid userId" })
+                
+                let data = await userModel.findById({ _id: userId })
+                
+                if (!data) return res.status(400).send({ status: false, message: "The userId is invalid" })
+                query.userId = userId
+            }
 
-        if (subcategory) {
-            if (subcategory.trim().length == 0) return res.status(400).send({ status: false, message: "Dont Left subcategory Query Empty" })
-            query.subcategory = subcategory.trim()
-        }
+            if (category) {
+                if (category.trim().length == 0) return res.status(400).send({ status: false, message: "Dont Left Category Query Empty" })
+                query.category = category
+            }
 
-        let bookData = await bookModel.find(query).select({_id: 1, title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1}).sort({"title": 1})
+            if (subcategory) {
+                if (subcategory.trim().length == 0) return res.status(400).send({ status: false, message: "Dont Left subcategory Query Empty" })
+                query.subcategory = subcategory.trim()
+            }
 
-        if (bookData.length == 0) {
-            return res.status(404).send({ status: false, message: "No book Found with provided information...Please Check Book Details or The Upper And Lower Cases Of letter" })
-        }
-        else {
-            return res.status(200).send({ status: true, message: "Books list", data: bookData })
+            let bookData = await bookModel.find( query,{ isDeleted: false } ).select({_id: 1, title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1}).sort({"title": 1})
+
+            if (bookData.length == 0) {
+                return res.status(404).send({ status: false, message: "No book Found with provided information...Please Check Book Details or The Upper And Lower Cases Of letter" })
+            }
+            else {
+                return res.status(200).send({ status: true, message: "Books list", data: bookData })
+            }
+        } else{
+            let bookData = await bookModel.find({isDeleted: false}).select({_id: 1, title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1}).sort({"title": 1})
+
+            if (bookData.length == 0) {
+                return res.status(404).send({ status: false, message: "No book Found with provided information...Please Check Book Details or The Upper And Lower Cases Of letter" })
+            }
+            else {
+                return res.status(200).send({ status: true, message: "Books list", data: bookData })
+            }
         }
     }
     catch(err) {

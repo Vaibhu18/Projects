@@ -15,7 +15,9 @@ const createReview = async function (req, res) {
         let checkbookId = await bookModel.findOne({_id: id, isDeleted: false})
         if (!checkbookId) return res.status(404).send({ status: false, message: "No Book Exists With This ID.." })
 
-        if (!data.reviewedBy) return res.status(400).send({ status: false, message: "reviewer name must be required" });
+        if (!data.reviewedBy){ data.reviewedBy = "Guest" }
+
+        if (!data.reviewedAt){ data.reviewedAt = Date.now() }
 
         if (!validation.isValidName(data.reviewedBy)) return res.status(400).send({ status: false, message: "Pls Enter Valid reviewer Name only in Alphabet format" })
 
@@ -24,12 +26,28 @@ const createReview = async function (req, res) {
         if (typeof data.rating !== "number" || ( data.rating < 1 || data.rating > 5)) return res.status(400).send({ status: false, message: "please enter valid rating in between 1 to 5" })
 
         let formatedDate = moment(Date.now())
+
+        let reviewCreated = await reviewModel.create({ reviewedBy: data.reviewedBy, rating: data.rating, review: data.review, reviewAt: formatedDate, bookId: id }).select({_id: 1, bookId: 1, reviewedBy: 1, reviewedAt: 1, rating: 1, review: 1})
         
-        let reviewCreated = await reviewModel.create({ reviewedBy: data.reviewedBy, rating: data.rating, review: data.review, reviewAt: formatedDate, bookId: id })
+        let bookData = await bookModel.findByIdAndUpdate({ _id: checkbookId._id } ,{ $inc: { reviews: 1 } },{ new: true }) 
+
+        let resultObject = {
+            _id: bookData._id,
+            title: bookData.title,
+            excerpt: bookData.excerpt,
+            userId: bookData.userId,
+            category: bookData.category,
+            subcategory: bookData.subcategory,
+            isDeleted: bookData.isDeleted,
+            reviews: bookData.reviews,
+            releasedAt: bookData.releasedAt,
+            createdAt: bookData.createdAt,
+            updatedAt: bookData.updatedAt
+        }
         
-        await bookModel.findByIdAndUpdate({ _id: checkbookId._id } ,{ $inc: { reviews: 1 } },{ new: true }) 
-        
-        return res.status(201).send({ status: true, message: "Success", data: reviewCreated })
+        resultObject.reviewsData = reviewCreated
+
+        return res.status(201).send({ status: true, message: "Success", data: resultObject })
 
     } catch (err) {
         console.log(err)
