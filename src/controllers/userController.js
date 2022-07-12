@@ -100,8 +100,6 @@ const userLogIn = async function(req, res){
         // Password Validation
         if(!data.password) return res.status(400).send({ status: false, message: "Password is missing" });
         
-        if(!validation.isValidPassword(data.password)) return res.status(400).send({ status: false, message: "Password should be within 8-15 Characters and must contain special, number, upper and lower character" }) //password validation
-        
         
         // Verifying Login
         let checkDetails = await userModel.findOne({email: data.email, password: data.password})
