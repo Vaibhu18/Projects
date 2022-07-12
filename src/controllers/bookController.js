@@ -158,7 +158,7 @@ const getBookByParams = async function(req, res){
 const updateBookById = async function(req, res){
     try{
         let id = req.params.bookId
-        if (validation.isValidObjectId(id)) return res.status(400).send({ status: false, message: "Please enter valid BookId" })
+        if (!validation.isValidObjectId(id)) return res.status(400).send({ status: false, message: "Please enter valid BookId" })
 
         let data = req.body
         if(Object.keys(data).length == 0) return res.status(400).send({ status: false, message: "Please Enter Data to Update" })
