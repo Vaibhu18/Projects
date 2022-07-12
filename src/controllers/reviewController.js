@@ -19,11 +19,11 @@ const createReview = async function (req, res) {
 
         // if (!data.reviewedAt){ data.reviewedAt = Date.now() }
 
+        if (!validation.isValidName(data.reviewedBy)) return res.status(400).send({ status: false, message: "Pls Enter Valid reviewer Name only in Alphabet format" })
+
         if (!data.reviewedAt) return res.status(400).send({ status: false, message: "Please enter Review Date" })
 
         if (!moment(data.reviewedAt, "YYYY-MM-DD", true).isValid()) return res.status(400).send({ status: false, message: "Please enter Date In YYYY-MM-DD Format" })
-
-        if (!validation.isValidName(data.reviewedBy)) return res.status(400).send({ status: false, message: "Pls Enter Valid reviewer Name only in Alphabet format" })
 
         if (!data.rating) return res.status(400).send({ status: false, message: "rating must be required" }); 
 
