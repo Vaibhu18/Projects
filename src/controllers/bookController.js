@@ -10,9 +10,6 @@ const createBook = async function(req, res){
         let data = req.body
         if(Object.keys(data).length == 0) return res.status(400).send({status: false, message: "Field Can't Empty.Please Enter Some Details" })
 
-        //authorization
-        if(req.headers["userId"] !== data.userId.toString()) return res.status(403).send({ status: false, message: "You are not authorized...." })
-
         // Title Validation
         if(!validation.isValid(data.title)) return res.status(400).send({status: false, message: "Title is Required.." })
         
@@ -27,6 +24,8 @@ const createBook = async function(req, res){
         
         if (!validation.isValidObjectId(data.userId)) return res.status(400).send({ status: false, message: "Please enter valid userId" })
         
+        //authorization
+        if(req.headers["userId"] !== data.userId) return res.status(403).send({ status: false, message: "You are not authorized...." })
 
         let userExists = await userModel.findById(data.userId)
         if(!userExists) return res.status(404).send({status: false, message: "User ID Not Found" })

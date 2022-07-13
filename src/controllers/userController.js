@@ -54,24 +54,24 @@ const createUser = async function(req,res) {
         
         
         // Address Validation
-        if(!data.address) return res.status(400).send({ status: false, message: "Address is Missing"})
-
-        // Type Of Address
-        if(typeof data.address !== 'object' || Array.isArray(data.address) || Object.keys(data.address).length==0) return res.status(400).send({ status: false, message: "Address Should be in Valid Format"})
+        if(data.address){
+            // Type Of Address
+            if(typeof data.address !== 'object' || Array.isArray(data.address) || Object.keys(data.address).length==0) return res.status(400).send({ status: false, message: "Address Should be in Valid Format"})
         
-        // Key-Value Pairs Is Present?
-        if (!("street" in data.address) || !("city" in data.address) || !("pincode" in data.address))
-            return res.status(400).send({ status: false, message: "street, city, pincode all three are required" })
+            // Key-Value Pairs Is Present?
+            if (!("street" in data.address) || !("city" in data.address) || !("pincode" in data.address))
+                return res.status(400).send({ status: false, message: "street, city, pincode all three are required" })
 
-        // Valid Pincode format
-        if (!validation.isValidPinCode(data.address.pincode))
-            return res.status(400).send({ status: false.valueOf, message: "pincode format not correct" })
+            // Valid Pincode format
+            if (!validation.isValidPinCode(data.address.pincode))
+                return res.status(400).send({ status: false.valueOf, message: "pincode format not correct" })
 
-        if (!data.address.street)
-            return res.status(400).send({ status: false, message: "Pls Enter Valid street" })
+            if (!data.address.street)
+                return res.status(400).send({ status: false, message: "Pls Enter Valid street" })
 
-        if (!validation.isValidName(data.address.city))
-            return res.status(400).send({ status: false, message: "Pls Enter Valid city" })
+            if (!validation.isValidName(data.address.city))
+                return res.status(400).send({ status: false, message: "Pls Enter Valid city" })
+        }
 
         const user = await userModel.create(data);
         return res.status(201).send({ status: true, message: 'User Created Successfully', data: user });
